@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Book Travel - Travel Mate</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="background-animation"></div>
+    <div class="container">
+        <nav class="navbar">
+            <div class="logo"><i class="fas fa-globe"></i> Travel Mate</div>
+            <div class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="admin.html">Admin</a>
+            </div>
+        </nav>
+
+        <main style="padding:2rem;min-height:calc(100vh - 100px);">
+            <section>
+                <div class="section-header">
+                    <h2><i class="fas fa-book"></i> Book Your Journey</h2>
+                    <p>Fill in your details, complete advance payment, and we'll show you the perfect route and suggestions</p>
+                </div>
+
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;max-width:1400px;margin:0 auto;animation:slideUp 0.6s ease;">
+                    <!-- Left: Booking Form -->
+                    <div style="background:rgba(255,255,255,0.03);padding:2rem;border-radius:15px;border:1px solid rgba(255,255,255,0.1);backdrop-filter:blur(10px);">
+                        <h3 style="color:#fff;margin-bottom:1.5rem;display:flex;align-items:center;gap:8px;"><i class="fas fa-pen"></i> Your Details</h3>
+                        <form id="bookingForm" style="display:flex;flex-direction:column;gap:12px;">
+                            <div>
+                                <label style="display:block;font-size:0.85rem;color:#ccc;margin-bottom:4px;">Full Name</label>
+                                <input id="bName" placeholder="Enter your name" required style="width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);color:#fff;transition:all 0.3s ease;" />
+                            </div>
+                            <div>
+                                <label style="display:block;font-size:0.85rem;color:#ccc;margin-bottom:4px;">Mobile Number</label>
+                                <input id="bMobile" placeholder="10-digit mobile" required style="width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);color:#fff;transition:all 0.3s ease;" />
+                            </div>
+                            <div>
+                                <label style="display:block;font-size:0.85rem;color:#ccc;margin-bottom:4px;">Email Address</label>
+                                <input id="bEmail" placeholder="your@email.com" type="email" required style="width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);color:#fff;transition:all 0.3s ease;" />
+                            </div>
+                            <div>
+                                <label style="display:block;font-size:0.85rem;color:#ccc;margin-bottom:4px;">Advance Payment (₹)</label>
+                                <input id="bAdvance" placeholder="Amount to pay now" type="number" min="0" style="width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);color:#fff;transition:all 0.3s ease;" />
+                            </div>
+                            <div>
+                                <label style="display:block;font-size:0.85rem;color:#ccc;margin-bottom:4px;">🎯 Tour Destination</label>
+                                <select id="bTourPlace" style="width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);color:#fff;transition:all 0.3s ease;cursor:pointer;">
+                                    <option value="Bodh Gaya">🛕 Bodh Gaya (Mahabodhi Temple)</option>
+                                    <option value="Rohtas Pahadi">⛰️ Rohtas Pahadi / Fort</option>
+                                    <option value="Gayaji">🗺️ Gayaji (Local)</option>
+                                    <option value="Manali">❄️ Manali (Himalayan)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label style="display:block;font-size:0.85rem;color:#ccc;margin-bottom:4px;">🚗 Travel Mode</label>
+                                <select id="bTravelMode" style="width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);color:#fff;transition:all 0.3s ease;cursor:pointer;">
+                                    <option value="taxi">🚕 Taxi</option>
+                                    <option value="bus">🚌 Bus</option>
+                                    <option value="train">🚆 Train</option>
+                                    <option value="flight">✈️ Flight</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label style="display:block;font-size:0.85rem;color:#ccc;margin-bottom:4px;">💬 Special Requests</label>
+                                <textarea id="bNotes" placeholder="Any special requirements? (optional)" style="width:100%;height:80px;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);color:#fff;resize:vertical;font-family:inherit;transition:all 0.3s ease;"></textarea>
+                            </div>
+                            <div style="display:flex;gap:12px;margin-top:8px;">
+                                <button type="submit" class="btn btn-primary" style="flex:1;"><i class="fas fa-check"></i> Confirm Booking</button>
+                                <button id="btnUseLiveLoc" type="button" class="btn btn-secondary" style="flex:1;"><i class="fas fa-location-dot"></i> Live Location</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Right: Booking Result & Suggestions -->
+                    <div id="bookingResult" class="hidden" style="background:rgba(255,255,255,0.03);padding:2rem;border-radius:15px;border:1px solid rgba(255,255,255,0.1);backdrop-filter:blur(10px);color:#fff;animation:slideUp 0.6s ease;">
+                        <h3 style="color:#4ECDC4;margin-bottom:1rem;"><i class="fas fa-check-circle"></i> Booking Confirmed!</h3>
+                        <p id="bookingSummary" style="background:rgba(78,205,196,0.1);padding:12px;border-radius:8px;border-left:3px solid #4ECDC4;margin-bottom:1.5rem;"></p>
+
+                        <div id="routeBox" style="margin-bottom:1.5rem;padding:12px;background:rgba(255,165,0,0.1);border-radius:8px;border-left:3px solid #FFA500;">
+                            <h4 style="margin-bottom:8px;"><i class="fas fa-map"></i> 📍 Route & Maps</h4>
+                            <a id="mapsLink" class="btn btn-secondary" target="_blank" style="text-decoration:none;display:inline-block;"><i class="fas fa-external-link"></i> Open Google Maps</a>
+                        </div>
+
+                        <div id="suggestions">
+                            <h4 style="margin-bottom:12px;"><i class="fas fa-lightbulb"></i> 💡 Smart Suggestions</h4>
+                            <div id="transportSuggestions" style="margin-bottom:12px;background:rgba(255,255,255,0.05);padding:12px;border-radius:8px;font-size:0.9rem;"></div>
+                            <div id="hotelSuggestions" style="margin-bottom:12px;background:rgba(255,255,255,0.05);padding:12px;border-radius:8px;font-size:0.9rem;"></div>
+                            <div id="foodSuggestions" style="margin-bottom:12px;background:rgba(255,255,255,0.05);padding:12px;border-radius:8px;font-size:0.9rem;"></div>
+                        </div>
+
+                        <div id="leaveReview" style="margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid rgba(255,255,255,0.1);">
+                            <h4 style="margin-bottom:12px;"><i class="fas fa-star"></i> ⭐ Share Your Experience</h4>
+                            <div style="display:grid;gap:12px;">
+                                <div>
+                                    <label style="display:block;font-size:0.85rem;color:#ccc;margin-bottom:6px;">How would you rate your trip?</label>
+                                    <select id="reviewRating" style="width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);color:#fff;cursor:pointer;">
+                                        <option>⭐⭐⭐⭐⭐ 5 - Excellent</option>
+                                        <option>⭐⭐⭐⭐ 4 - Good</option>
+                                        <option>⭐⭐⭐ 3 - Average</option>
+                                        <option>⭐⭐ 2 - Fair</option>
+                                        <option>⭐ 1 - Poor</option>
+                                    </select>
+                                </div>
+                                <textarea id="reviewText" placeholder="Share your experience (optional)" style="width:100%;height:70px;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);color:#fff;resize:vertical;font-family:inherit;transition:all 0.3s ease;"></textarea>
+                                <button id="submitReview" class="btn btn-primary"><i class="fas fa-paper-plane"></i> Submit Review</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+<script>
+// Booking logic: store booking in localStorage and show route + suggestions
+const bookingForm = document.getElementById('bookingForm');
+const bookingResult = document.getElementById('bookingResult');
+const bookingSummary = document.getElementById('bookingSummary');
+const mapsLink = document.getElementById('mapsLink');
+const transportSuggestions = document.getElementById('transportSuggestions');
+const hotelSuggestions = document.getElementById('hotelSuggestions');
+const foodSuggestions = document.getElementById('foodSuggestions');
+const btnUseLiveLoc = document.getElementById('btnUseLiveLoc');
+const reviewRating = document.getElementById('reviewRating');
+const reviewText = document.getElementById('reviewText');
+const submitReview = document.getElementById('submitReview');
+
+let userCoords = null; // {lat,lon}
+
+btnUseLiveLoc.addEventListener('click', () => {
+    if (!navigator.geolocation) return alert('Geolocation not supported');
+    navigator.geolocation.getCurrentPosition(pos => {
+        userCoords = { lat: pos.coords.latitude.toFixed(6), lon: pos.coords.longitude.toFixed(6) };
+        alert('Live location captured');
+    }, () => alert('Permission denied or not available'));
+});
+
+bookingForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const booking = {
+        id: Date.now(),
+        name: document.getElementById('bName').value.trim(),
+        mobile: document.getElementById('bMobile').value.trim(),
+        email: document.getElementById('bEmail').value.trim(),
+        advance: document.getElementById('bAdvance').value || '0',
+        tourPlace: document.getElementById('bTourPlace').value,
+        travelMode: document.getElementById('bTravelMode').value,
+        notes: document.getElementById('bNotes').value.trim(),
+        timestamp: new Date().toISOString(),
+        coords: userCoords
+    };
+
+    // Save booking to localStorage
+    let bookings = [];
+    try { bookings = JSON.parse(localStorage.getItem('bookings')||'[]'); } catch(e){ bookings = []; }
+    bookings.unshift(booking);
+    localStorage.setItem('bookings', JSON.stringify(bookings));
+
+    // Show booking summary
+    bookingResult.classList.remove('hidden');
+    bookingSummary.innerHTML = `<strong>${booking.name}</strong> — ${booking.tourPlace}, travel by ${booking.travelMode}. Advance: ${booking.advance}`;
+
+    // Build Google Maps directions link
+    let origin = 'Current+Location';
+    if (userCoords) {
+        origin = `${userCoords.lat},${userCoords.lon}`;
+    }
+    const destination = encodeURIComponent(booking.tourPlace);
+    const mapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${destination}&travelmode=driving`;
+    mapsLink.href = mapsUrl;
+
+    // Suggestions: simple mocked recommendations
+    transportSuggestions.innerHTML = `<h5>Transport Suggestions</h5>
+        <ul>
+            <li>Taxi: Approx ₹1200 from your location (depends on distance)</li>
+            <li>Bus: Book local/state buses (₹200 - ₹800)</li>
+            <li>Train: Check nearest station; sleeper/AC options available</li>
+            <li>Flight: Nearest airport connections available for long distances</li>
+        </ul>`;
+
+    hotelSuggestions.innerHTML = `<h5>Hotels & Stay</h5>
+        <ul>
+            <li>Budget: ₹800/night - Local guesthouses</li>
+            <li>Mid-range: ₹2500/night - Comfortable hotels</li>
+            <li>Premium: ₹8000+/night - Luxury stays</li>
+        </ul>`;
+
+    foodSuggestions.innerHTML = `<h5>Food & Cafes</h5>
+        <ul>
+            <li>Local meals: ₹100 - ₹300</li>
+            <li>Restaurant dinner: ₹400 - ₹1200</li>
+            <li>Cafes & snacks: ₹80 - ₹400</li>
+            <li>Popular Markets & Shopping: Try local bazaars for souvenirs and handicrafts</li>
+        </ul>`;
+
+    // scroll to result
+    bookingResult.scrollIntoView({ behavior: 'smooth' });
+});
+
+submitReview.addEventListener('click', () => {
+    const rating = parseInt(reviewRating.value);
+    const text = reviewText.value.trim();
+    let bookings = JSON.parse(localStorage.getItem('bookings')||'[]');
+    if (bookings.length === 0) return alert('No booking found to attach review');
+    // Attach review to last booking
+    bookings[0].rating = rating;
+    bookings[0].review = text;
+    localStorage.setItem('bookings', JSON.stringify(bookings));
+    alert('Thank you for your review!');
+});
+</script>
+</body>
+</html>

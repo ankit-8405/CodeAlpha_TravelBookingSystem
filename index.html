@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Travel Booking System - IP Geolocation</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</head>
+<body>
+    <div class="background-animation"></div>
+    
+    <div class="container">
+        <nav class="navbar">
+            <div class="logo">
+                <i class="fas fa-globe"></i> Travel Mate
+            </div>
+            <div class="nav-links">
+                <a href="#home">Home</a>
+                <a href="#location">Location</a>
+                <a href="#deals">Deals</a>
+                <a href="booking.html">Booking</a>
+                <a href="admin.html">Admin</a>
+            </div>
+            <div style="margin-left:12px;">
+                <button id="currencyToggle" class="btn btn-secondary">Show ₹</button>
+            </div>
+        </nav>
+
+        <header id="home">
+            <div class="header-content">
+                <h1><span class="gradient-text">🌍 Discover Your World</span></h1>
+                <p style="font-size:1.2rem;margin-bottom:2rem;">Find amazing travel deals, book your adventure, and explore with confidence</p>
+                <div class="header-icons">
+                    <i class="fas fa-plane"></i>
+                    <i class="fas fa-map-marker-alt"></i>
+                    <i class="fas fa-heart"></i>
+                </div>
+                <div style="margin-top:2rem;">
+                    <button id="heroGetLocationBtn" class="btn btn-primary btn-lg" style="padding:14px 32px;font-size:1.1rem;">
+                        <i class="fas fa-crosshairs"></i> Get My Location & Deals
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Home Map -->
+        <section id="mapSection" style="padding:0 2rem;">
+            <div class="section-header">
+                <h2><i class="fas fa-map"></i> Explore Map</h2>
+                <p>Map shows your location (if allowed) and popular destinations.</p>
+            </div>
+            <div id="homeMap" style="height:360px;border-radius:12px;overflow:hidden;margin-bottom:1rem;"></div>
+        </section>
+
+        <!-- Suggested Travels -->
+        <section class="suggested-section" id="suggested">
+            <div class="section-header">
+                <h2><i class="fas fa-compass"></i> Suggested Travels</h2>
+                <p>Popular picks and curated trips for you</p>
+            </div>
+
+            <div class="suggested-grid" id="suggestedGrid">
+                <!-- populated by JS -->
+            </div>
+
+            <div class="range-filter">
+                <label>Max Price: <span id="priceRangeValue">$2000</span></label>
+                <input id="priceRange" type="range" min="50" max="5000" value="2000" step="10" />
+            </div>
+        </section>
+
+        <!-- Safety & Warnings -->
+        <section class="safety-section" id="safety">
+            <div class="section-header">
+                <h2><i class="fas fa-shield-alt"></i> Safety & Warnings</h2>
+                <p>Important safety information and travel advisories</p>
+            </div>
+            <div class="safety-grid">
+                <div class="safety-item">
+                    <h4>Health & Safety</h4>
+                    <p>Check local health advisories, vaccination requirements, and follow local guidelines.</p>
+                </div>
+                <div class="safety-item">
+                    <h4>Weather Warnings</h4>
+                    <p>Monitor weather alerts for your destination and plan accordingly.</p>
+                </div>
+                <div class="safety-item">
+                    <h4>Local Laws</h4>
+                    <p>Respect local laws and customs. Carry identification and travel documents at all times.</p>
+                </div>
+                <div class="safety-item">
+                    <h4>Emergency Contacts</h4>
+                    <p>Store local emergency numbers and embassy contacts before travel.</p>
+                </div>
+            </div>
+        </section>
+
+        <main>
+            <section class="location-section" id="location">
+                <div class="section-header">
+                    <h2><i class="fas fa-location-dot"></i> Your Location</h2>
+                    <p>Get instant access to your geolocation data</p>
+                </div>
+
+                <button id="getLocationBtn" class="btn btn-primary btn-lg">
+                    <i class="fas fa-crosshairs"></i> Get My Location
+                </button>
+                
+                <div id="loadingSpinner" class="loader hidden"></div>
+                
+                <div id="locationCard" class="location-card hidden">
+                    <div class="location-grid">
+                        <div class="location-item">
+                            <div class="icon"><i class="fas fa-city"></i></div>
+                            <label>City</label>
+                            <p id="cityDisplay" class="value">-</p>
+                        </div>
+                        <div class="location-item">
+                            <div class="icon"><i class="fas fa-map"></i></div>
+                            <label>Region</label>
+                            <p id="regionDisplay" class="value">-</p>
+                        </div>
+                        <div class="location-item">
+                            <div class="icon"><i class="fas fa-flag"></i></div>
+                            <label>Country</label>
+                            <p id="countryDisplay" class="value">-</p>
+                        </div>
+                        <!-- Sensitive fields are hidden from the public UI -->
+                        <div class="location-item sensitive">
+                            <div class="icon"><i class="fas fa-globe"></i></div>
+                            <label>IP Address</label>
+                            <p id="ipDisplay" class="value">Hidden</p>
+                        </div>
+                                            <div class="location-item sensitive">
+                                                <div class="icon"><i class="fas fa-compass"></i></div>
+                                                <label>Coordinates</label>
+                                                <p id="coordsDisplay" class="value">Hidden</p>
+                                            </div>
+                                            <div class="location-item sensitive">
+                                                <div class="icon"><i class="fas fa-building"></i></div>
+                                                <label>ISP Organization</label>
+                                                <p id="ispDisplay" class="value">Hidden</p>
+                                            </div>
+                    </div>
+                </div>
+
+                <div id="errorMessage" class="error-message hidden">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span id="errorText"></span>
+                </div>
+            </section>
+
+            <!-- India Highlights: hotels, tours, adventure spots -->
+            <section class="india-section" id="india">
+                <div class="section-header">
+                    <h2><i class="fas fa-indian-rupee-sign"></i> India Highlights</h2>
+                    <p>Hotels, tour places and adventure destinations across India</p>
+                </div>
+
+                <div class="india-actions">
+                    <button id="showIndiaBtn" class="btn btn-secondary">Show India Highlights</button>
+                    <button id="liveLocBtn" class="btn btn-primary">Show Live Location</button>
+                </div>
+
+                <div id="indiaContent" class="india-content hidden">
+                    <div class="india-grid">
+                        <div class="india-column">
+                            <h3>Top Hotels</h3>
+                            <ul id="indiaHotels">
+                                <!-- Populated dynamically -->
+                            </ul>
+                        </div>
+                        <div class="india-column">
+                            <h3>Tour & Heritage Places</h3>
+                            <ul id="indiaTours">
+                                <!-- Populated dynamically -->
+                            </ul>
+                        </div>
+                        <div class="india-column">
+                            <h3>Adventure & Hills</h3>
+                            <ul id="indiaAdventures">
+                                <!-- Populated dynamically -->
+                            </ul>
+                        </div>
+                    </div>
+                    <div id="liveLocationDisplay" class="live-location hidden">
+                        <h4>Live Location (from your device)</h4>
+                        <p id="liveCoords">-</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="travel-section" id="deals">
+                <div class="section-header">
+                    <h2><i class="fas fa-ticket"></i> Travel Deals</h2>
+                    <p>Exclusive offers for your destination</p>
+                </div>
+
+                <div id="recommendationCard" class="recommendation-card hidden">
+                    <div class="recommendation-content">
+                        <i class="fas fa-star"></i>
+                        <p id="recommendationText">Based on your location, here are some travel deals available in your region!</p>
+                        <button class="btn btn-secondary"><i class="fas fa-arrow-right"></i> View Deals</button>
+                    </div>
+                </div>
+
+                <div class="deals-placeholder">
+                    <i class="fas fa-search-location"></i>
+                    <p>Enable location to see personalized travel deals</p>
+                </div>
+            </section>
+
+            <section class="features-section">
+                <h2>Why Choose Us?</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-badge">⚡</div>
+                        <i class="fas fa-bolt"></i>
+                        <h3>Instant Detection</h3>
+                        <p>Get your location in seconds with our advanced geolocation technology. Fast, accurate, and reliable.</p>
+                        <ul class="feature-list">
+                            <li>✓ Real-time location detection</li>
+                            <li>✓ Accurate IP geolocation</li>
+                            <li>✓ Instant processing</li>
+                        </ul>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-badge">🔒</div>
+                        <i class="fas fa-shield"></i>
+                        <h3>Secure & Private</h3>
+                        <p>Your data is protected with enterprise-grade encryption. We never share your information.</p>
+                        <ul class="feature-list">
+                            <li>✓ End-to-end encryption</li>
+                            <li>✓ GDPR compliant</li>
+                            <li>✓ No data sharing</li>
+                        </ul>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-badge">🎁</div>
+                        <i class="fas fa-gift"></i>
+                        <h3>Exclusive Deals</h3>
+                        <p>Access exclusive travel deals and offers tailored to your location. Save up to 50% on travel packages.</p>
+                        <ul class="feature-list">
+                            <li>✓ Regional discounts</li>
+                            <li>✓ Early bird offers</li>
+                            <li>✓ Limited time deals</li>
+                        </ul>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-badge">🕐</div>
+                        <i class="fas fa-headset"></i>
+                        <h3>24/7 Support</h3>
+                        <p>Our dedicated support team is available round the clock to assist you with any queries.</p>
+                        <ul class="feature-list">
+                            <li>✓ Live chat support</li>
+                            <li>✓ Email support</li>
+                            <li>✓ Phone assistance</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section class="exclusive-deals-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-star"></i> Exclusive Deals & Offers</h2>
+                    <p>Special discounts based on your location</p>
+                </div>
+
+                <div id="dealsContainer" class="deals-container">
+                    <div class="deal-card">
+                        <div class="deal-badge">-30%</div>
+                        <div class="deal-image">✈️</div>
+                        <h3>Flight Deals</h3>
+                        <p>Book flights and save up to 30% on round-trip bookings. Limited time offer!</p>
+                        <div class="deal-price"><span class="original">$599</span> <span class="discounted">$419</span></div>
+                        <button class="btn btn-secondary">Claim Offer</button>
+                    </div>
+
+                    <div class="deal-card">
+                        <div class="deal-badge">-40%</div>
+                        <div class="deal-image">🏨</div>
+                        <h3>Hotel Packages</h3>
+                        <p>Stay in luxury hotels with 40% discount on 3+ night bookings. Premium comfort assured!</p>
+                        <div class="deal-price"><span class="original">$200/night</span> <span class="discounted">$120/night</span></div>
+                        <button class="btn btn-secondary">Book Now</button>
+                    </div>
+
+                    <div class="deal-card">
+                        <div class="deal-badge">-25%</div>
+                        <div class="deal-image">🏖️</div>
+                        <h3>Vacation Packages</h3>
+                        <p>All-inclusive vacation packages with 25% savings. Perfect for family getaways!</p>
+                        <div class="deal-price"><span class="original">$1,999</span> <span class="discounted">$1,499</span></div>
+                        <button class="btn btn-secondary">Explore</button>
+                    </div>
+
+                    <div class="deal-card">
+                        <div class="deal-badge">-35%</div>
+                        <div class="deal-image">🚗</div>
+                        <h3>Car Rental</h3>
+                        <p>Rent luxury cars with 35% discount on monthly bookings. Drive in style!</p>
+                        <div class="deal-price"><span class="original">$50/day</span> <span class="discounted">$32.50/day</span></div>
+                        <button class="btn btn-secondary">Reserve</button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="comfort-deals-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-heart"></i> Your Comfort & Convenience</h2>
+                    <p>Premium services for ultimate travel comfort</p>
+                </div>
+
+                <div class="comfort-grid">
+                    <div class="comfort-item">
+                        <i class="fas fa-wifi"></i>
+                        <h4>Free WiFi Everywhere</h4>
+                        <p>Stay connected with free WiFi at all partner hotels and accommodations</p>
+                    </div>
+                    <div class="comfort-item">
+                        <i class="fas fa-utensils"></i>
+                        <h4>Exclusive Dining</h4>
+                        <p>Access premium restaurants with special discounts across the globe</p>
+                    </div>
+                    <div class="comfort-item">
+                        <i class="fas fa-concierge-bell"></i>
+                        <h4>Concierge Service</h4>
+                        <p>Personal concierge available to arrange everything for your trip</p>
+                    </div>
+                    <div class="comfort-item">
+                        <i class="fas fa-car"></i>
+                        <h4>Airport Transfers</h4>
+                        <p>Complimentary airport pickups and drop-offs for Premium members</p>
+                    </div>
+                    <div class="comfort-item">
+                        <i class="fas fa-spa"></i>
+                        <h4>Spa & Wellness</h4>
+                        <p>Enjoy spa treatments and wellness programs at discounted rates</p>
+                    </div>
+                    <div class="comfort-item">
+                        <i class="fas fa-users"></i>
+                        <h4>Group Discounts</h4>
+                        <p>Special rates for group bookings and family travel packages</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="success-stories-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-trophy"></i> Success Stories & Testimonials</h2>
+                    <p>Real experiences from our happy travelers</p>
+                </div>
+
+                <div class="testimonials-container">
+                    <div class="testimonial-card">
+                        <div class="stars">⭐⭐⭐⭐⭐</div>
+                        <p>"Amazing service! Saved $500 on my European trip thanks to exclusive deals. Highly recommended!"</p>
+                        <div class="testimonial-author">
+                            <div class="avatar">👨</div>
+                            <div>
+                                <h4>John Smith</h4>
+                                <p>USA</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="testimonial-card">
+                        <div class="stars">⭐⭐⭐⭐⭐</div>
+                        <p>"The 24/7 support team helped me book perfect vacation in 5 minutes. Best travel platform ever!"</p>
+                        <div class="testimonial-author">
+                            <div class="avatar">👩</div>
+                            <div>
+                                <h4>Sarah Johnson</h4>
+                                <p>UK</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="testimonial-card">
+                        <div class="stars">⭐⭐⭐⭐⭐</div>
+                        <p>"Loved the personalized recommendations. Got 40% off hotels and amazing travel deals!"</p>
+                        <div class="testimonial-author">
+                            <div class="avatar">👨</div>
+                            <div>
+                                <h4>Rajesh Kumar</h4>
+                                <p>India</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="testimonial-card">
+                        <div class="stars">⭐⭐⭐⭐⭐</div>
+                        <p>"Secure, fast, and reliable! My family had the best vacation ever with their exclusive packages."</p>
+                        <div class="testimonial-author">
+                            <div class="avatar">👩</div>
+                            <div>
+                                <h4>Emma Wilson</h4>
+                                <p>Australia</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="tour-success-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-check-circle"></i> Tour Success Guarantee</h2>
+                    <p>Your travel satisfaction is our priority</p>
+                </div>
+
+                <div class="guarantee-grid">
+                    <div class="guarantee-item">
+                        <div class="guarantee-number">100%</div>
+                        <h4>Satisfaction Guaranteed</h4>
+                        <p>If not satisfied, get a full refund within 30 days</p>
+                    </div>
+                    <div class="guarantee-item">
+                        <div class="guarantee-number">50K+</div>
+                        <h4>Happy Customers</h4>
+                        <p>Over 50,000 satisfied travelers trust us</p>
+                    </div>
+                    <div class="guarantee-item">
+                        <div class="guarantee-number">$5M+</div>
+                        <h4>Saved in Deals</h4>
+                        <p>Total savings for our customers this year</p>
+                    </div>
+                    <div class="guarantee-item">
+                        <div class="guarantee-number">150+</div>
+                        <h4>Destinations</h4>
+                        <p>Access exclusive deals in 150+ countries</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>Travel Mate</h4>
+                    <p>Your ultimate travel companion</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="#home">Home</a></li>
+                        <li><a href="#location">Location</a></li>
+                        <li><a href="#deals">Deals</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Follow Us</h4>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 CodeAlpha Travel Booking System. All rights reserved.</p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

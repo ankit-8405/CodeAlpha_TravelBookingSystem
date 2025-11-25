@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Manage Offers</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <nav class="navbar">
+            <div class="logo"><i class="fas fa-globe"></i> Travel Mate Admin</div>
+            <div class="nav-links"><a href="index.html">Back to Site</a></div>
+        </nav>
+
+        <main style="min-height:calc(100vh - 100px);">
+            <!-- Analytics Section -->
+            <section style="padding:2rem;background:linear-gradient(135deg,rgba(255,107,107,0.1),rgba(78,205,196,0.1));border-bottom:1px solid rgba(255,255,255,0.1);">
+                <div style="max-width:1400px;margin:0 auto;">
+                    <div class="section-header">
+                        <h2><i class="fas fa-chart-line"></i> Dashboard Analytics</h2>
+                        <p>Real-time insights into your travel bookings and customer satisfaction</p>
+                    </div>
+
+                    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.5rem;margin-top:1.5rem;">
+                        <!-- Total Bookings Card -->
+                        <div class="stat-card" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:15px;padding:2rem;text-align:center;backdrop-filter:blur(10px);animation:slideUp 0.6s ease;">
+                            <div style="font-size:3rem;color:#FF6B6B;margin-bottom:0.5rem;font-weight:bold;"><i class="fas fa-suitcase-rolling"></i></div>
+                            <h3 id="totalTravels" style="font-size:2.5rem;color:#fff;margin:0.5rem 0;">0</h3>
+                            <p style="color:#aaa;font-size:0.9rem;margin:0;">Total Bookings</p>
+                        </div>
+
+                        <!-- Reviews Distribution Pie Chart -->
+                        <div class="chart-card" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:15px;padding:1.5rem;backdrop-filter:blur(10px);animation:slideUp 0.7s ease;">
+                            <h4 style="color:#4ECDC4;margin-bottom:1rem;display:flex;align-items:center;gap:8px;"><i class="fas fa-star"></i> Review Distribution</h4>
+                            <canvas id="reviewsPie" width="300" height="180"></canvas>
+                        </div>
+
+                        <!-- Bookings Over Time Line Chart -->
+                        <div class="chart-card" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:15px;padding:1.5rem;backdrop-filter:blur(10px);animation:slideUp 0.8s ease;">
+                            <h4 style="color:#4ECDC4;margin-bottom:1rem;display:flex;align-items:center;gap:8px;"><i class="fas fa-calendar"></i> Bookings Over Time</h4>
+                            <canvas id="bookingsLine" width="400" height="180"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Manage Offers Section -->
+            <section style="padding:2rem;">
+                <div style="max-width:1400px;margin:0 auto;">
+                    <div class="section-header">
+                        <h2><i class="fas fa-gift"></i> Manage Travel Offers</h2>
+                        <p>Create and publish special offers that appear to users worldwide</p>
+                    </div>
+
+                    <!-- Offer Form -->
+                    <form id="offerForm" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.1);border-radius:15px;padding:2rem;margin-top:1.5rem;backdrop-filter:blur(10px);">
+                        <h3 style="color:#fff;margin-bottom:1.5rem;display:flex;align-items:center;gap:8px;"><i class="fas fa-pen-fancy"></i> Create New Offer</h3>
+                        
+                        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:12px;">
+                            <div>
+                                <label style="display:block;font-size:0.85rem;color:#ccc;margin-bottom:4px;">Country Code</label>
+                                <input id="offerCountry" placeholder="IN, US, ALL" style="width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);color:#fff;" />
+                            </div>
+                            <div>
+                                <label style="display:block;font-size:0.85rem;color:#ccc;margin-bottom:4px;">Emoji</label>
+                                <input id="offerEmoji" placeholder="✈️" style="width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);color:#fff;" />
+                            </div>
+                            <div>
+                                <label style="display:block;font-size:0.85rem;color:#ccc;margin-bottom:4px;">Offer Title</label>
+                                <input id="offerTitle" placeholder="Summer Flight Sale" style="width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);color:#fff;" />
+                            </div>
+                            <div>
+                                <label style="display:block;font-size:0.85rem;color:#ccc;margin-bottom:4px;">Discount</label>
+                                <input id="offerDiscount" placeholder="-30%" style="width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);color:#fff;" />
+                            </div>
+                            <div>
+                                <label style="display:block;font-size:0.85rem;color:#ccc;margin-bottom:4px;">Original Price</label>
+                                <input id="offerOriginal" placeholder="$500" style="width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);color:#fff;" />
+                            </div>
+                            <div>
+                                <label style="display:block;font-size:0.85rem;color:#ccc;margin-bottom:4px;">Discounted Price</label>
+                                <input id="offerPrice" placeholder="$350" style="width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);color:#fff;" />
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom:12px;">
+                            <label style="display:block;font-size:0.85rem;color:#ccc;margin-bottom:4px;">Description</label>
+                            <textarea id="offerDesc" placeholder="Describe this amazing offer..." style="width:100%;height:80px;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);color:#fff;resize:vertical;font-family:inherit;"></textarea>
+                        </div>
+
+                        <div style="display:flex;gap:12px;flex-wrap:wrap;">
+                            <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save Offer</button>
+                            <button id="clearOffers" type="button" class="btn btn-secondary"><i class="fas fa-trash"></i> Clear All Offers</button>
+                        </div>
+                    </form>
+
+                    <!-- Existing Offers -->
+                    <h3 style="margin-top:2rem;margin-bottom:1rem;color:#fff;display:flex;align-items:center;gap:8px;"><i class="fas fa-list"></i> Active Offers</h3>
+                    <div id="offersList" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.5rem;"></div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        const form = document.getElementById('offerForm');
+        const offersList = document.getElementById('offersList');
+        const clearBtn = document.getElementById('clearOffers');
+
+        function loadOffers() {
+            let offers = [];
+            try { offers = JSON.parse(localStorage.getItem('adminOffers')||'[]'); } catch (e) { offers = []; }
+            offersList.innerHTML = offers.length === 0 ? '<p style="color:#aaa;grid-column:1/-1;text-align:center;padding:2rem;">No offers yet. Create one above!</p>' : '';
+            offers.forEach((o, idx) => {
+                const div = document.createElement('div');
+                div.className = 'deal-card';
+                div.style.cssText = 'background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:1.5rem;backdrop-filter:blur(10px);position:relative;overflow:hidden;transition:all 0.3s ease;animation:slideUp 0.6s ease;';
+                div.innerHTML = `
+                    <div class="deal-badge" style="position:absolute;top:12px;right:12px;background:#FF6B6B;color:#fff;padding:6px 12px;border-radius:20px;font-size:0.8rem;font-weight:bold;">${o.discount||'SALE'}</div>
+                    <div class="deal-image" style="font-size:3rem;margin-bottom:12px;text-align:center;">${o.emoji||'🎁'}</div>
+                    <h3 style="color:#fff;margin:12px 0;font-size:1.1rem;">${o.title||'Offer'}</h3>
+                    <p style="color:#aaa;font-size:0.9rem;margin:8px 0;min-height:40px;">${o.desc||''}</p>
+                    <div class="deal-price" style="display:flex;gap:8px;align-items:center;margin:12px 0;justify-content:center;">
+                        <span class="original" style="color:#999;text-decoration:line-through;font-size:0.9rem;">${o.original||''}</span>
+                        <span class="discounted" style="color:#4ECDC4;font-weight:bold;font-size:1.1rem;">${o.price||''}</span>
+                    </div>
+                    <div style="margin-top:12px;display:flex;gap:8px;justify-content:space-between;">
+                        <span style="color:#666;font-size:0.8rem;padding:4px 8px;background:rgba(255,255,255,0.05);border-radius:6px;">🌍 ${o.country||'ALL'}</span>
+                        <button data-idx="${idx}" class="btn btn-secondary delBtn" style="padding:6px 12px;font-size:0.85rem;"><i class="fas fa-trash"></i> Delete</button>
+                    </div>
+                `;
+                offersList.appendChild(div);
+            });
+
+            Array.from(document.getElementsByClassName('delBtn')).forEach(b => {
+                b.addEventListener('click', (e) => {
+                    const idx = parseInt(e.target.closest('.delBtn').getAttribute('data-idx'));
+                    let offers = JSON.parse(localStorage.getItem('adminOffers')||'[]');
+                    offers.splice(idx,1);
+                    localStorage.setItem('adminOffers', JSON.stringify(offers));
+                    loadOffers();
+                });
+            });
+        }
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const offer = {
+                country: document.getElementById('offerCountry').value.trim().toUpperCase() || 'ALL',
+                emoji: document.getElementById('offerEmoji').value.trim() || '🎁',
+                title: document.getElementById('offerTitle').value.trim(),
+                discount: document.getElementById('offerDiscount').value.trim(),
+                original: document.getElementById('offerOriginal').value.trim(),
+                price: document.getElementById('offerPrice').value.trim(),
+                desc: document.getElementById('offerDesc').value.trim(),
+            };
+            let offers = [];
+            try { offers = JSON.parse(localStorage.getItem('adminOffers')||'[]'); } catch(e){ offers = []; }
+            offers.unshift(offer);
+            localStorage.setItem('adminOffers', JSON.stringify(offers));
+            form.reset();
+            loadOffers();
+            alert('Offer saved (localStorage). It will appear to users based on country.');
+        });
+
+        clearBtn.addEventListener('click', () => {
+            if (confirm('Clear all admin offers from localStorage?')) {
+                localStorage.removeItem('adminOffers');
+                loadOffers();
+            }
+        });
+
+        // Analytics: load bookings and render charts
+        function loadAnalytics() {
+            let bookings = [];
+            try { bookings = JSON.parse(localStorage.getItem('bookings')||'[]'); } catch(e){ bookings = []; }
+
+            // Total travels
+            const totalTravelsEl = document.getElementById('totalTravels');
+            if (totalTravelsEl) totalTravelsEl.textContent = bookings.length;
+
+            // Reviews pie: distribution by rating
+            const ratingCounts = { '5':0,'4':0,'3':0,'2':0,'1':0 };
+            bookings.forEach(b => { if (b.rating) ratingCounts[String(b.rating)] = (ratingCounts[String(b.rating)]||0)+1; });
+
+            const pieCtx = document.getElementById('reviewsPie');
+            if (pieCtx && window.Chart) {
+                try {
+                    new Chart(pieCtx, {
+                        type: 'pie',
+                        data: {
+                            labels: ['5★','4★','3★','2★','1★'],
+                            datasets: [{
+                                data: [ratingCounts['5'], ratingCounts['4'], ratingCounts['3'], ratingCounts['2'], ratingCounts['1']],
+                                backgroundColor: ['#2ecc71','#3498db','#f1c40f','#e67e22','#e74c3c']
+                            }]
+                        }
+                    });
+                } catch(e) { console.warn('Chart error', e); }
+            }
+
+            // Bookings over time (by day)
+            const dateMap = {};
+            bookings.forEach(b => { const d = (new Date(b.timestamp)).toISOString().slice(0,10); dateMap[d] = (dateMap[d]||0)+1; });
+            const dates = Object.keys(dateMap).sort();
+            const counts = dates.map(d => dateMap[d]);
+
+            const lineCtx = document.getElementById('bookingsLine');
+            if (lineCtx && window.Chart) {
+                try {
+                    new Chart(lineCtx, {
+                        type: 'line',
+                        data: {
+                            labels: dates,
+                            datasets: [{ label: 'Bookings', data: counts, borderColor: '#FF6B6B', tension: 0.2, fill: false }]
+                        },
+                        options: { scales: { x: { display: true }, y: { beginAtZero: true, precision:0 } } }
+                    });
+                } catch(e) { console.warn('Chart error', e); }
+            }
+        }
+
+        // Init
+        document.addEventListener('DOMContentLoaded', () => { loadOffers(); loadAnalytics(); });
+    </script>
+</body>
+</html>
